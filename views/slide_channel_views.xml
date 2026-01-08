@@ -7,9 +7,12 @@
         <field name="inherit_id" ref="website_slides.view_slide_channel_form"/>
         <field name="arch" type="xml">
             <xpath expr="//notebook" position="inside">
-                <page string="Blockchain Certification">
+                <page string="Monetization &amp; Blockchain">
                     <group>
-                        <group>
+                        <group string="Course Pricing">
+                            <field name="course_price" widget="monetary"/>
+                        </group>
+                        <group string="Blockchain Certification">
                             <field name="blockchain_certification_active" widget="boolean_toggle"/>
                             <field name="blockchain_cost" invisible="not blockchain_certification_active"/>
                         </group>

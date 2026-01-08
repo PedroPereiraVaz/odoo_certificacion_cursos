@@ -28,6 +28,43 @@ class SlideChannel(models.Model):
         readonly=True
     )
 
+    course_price = fields.Monetary(
+        string="Course Price",
+        compute="_compute_course_price",
+        inverse="_inverse_course_price",
+        currency_field='currency_id',
+        help="The base price of the course. Setting this will automatically configure the linked Product."
+    )
+
+    @api.depends('product_id.list_price')
+    def _compute_course_price(self):
+        for record in self:
+            record.course_price = record.product_id.list_price if record.product_id else 0.0
+
+    def _inverse_course_price(self):
+        for record in self:
+            if record.course_price > 0:
+                if not record.product_id:
+                    # Create Product if it doesn't exist
+                    product = self.env['product.product'].create({
+                        'name': record.name,
+                        'type': 'service',
+                        'invoice_policy': 'order',
+                        'list_price': record.course_price,
+                        'purchase_ok': False,
+                    })
+                    record.product_id = product.id
+                else:
+                    # Update existing product price
+                    record.product_id.list_price = record.course_price
+                
+                # Ensure Enrollment is set to Payment
+                if record.enroll != 'payment':
+                    record.enroll = 'payment'
+            
+            elif record.product_id:
+                record.product_id.list_price = 0.0
+
     @api.model_create_multi
     def create(self, vals_list):
         channels = super(SlideChannel, self).create(vals_list)

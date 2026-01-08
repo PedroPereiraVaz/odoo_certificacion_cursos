@@ -10,7 +10,7 @@
         - Supports Revocation and Traceability.
     """,
     'category': 'Website/eLearning',
-    'author': 'Antigravity',
+    'author': 'Pedro',
     'depends': [
         'website_slides',
         'website_sale_slides', # Important for sale flow
